@@ -47,7 +47,7 @@ const updateCategory = async (req, res) => {
         const { id } = req.params;
         const { name, description, image } = req.body;
 
-        const { rows } = await pool.query(`UPDATE category SET name = $1, description = $2, image = $3 WHERE id = $4 RETURNING *`,[name, description, image, id]);
+        const { rows } = await pool.query(`UPDATE category SET name = $1, description = $2, image = $3 WHERE id = $4 RETURNING *`, [name, description, image, id]);
         if (rows.length === 0) {
             return res.status(404).json({ message: "Category not found" });
         }
@@ -58,4 +58,13 @@ const updateCategory = async (req, res) => {
     }
 }
 
-module.exports = { addCategory, getAllCategory, getBycategory, updateCategory };
+const deleteCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { rows } = await pool.query('DELETE FROM category WHERE id = $1 RETURNING *', [id]);
+        res.status(200).json({ message: "Category deleted successfully" });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+}
+module.exports = { addCategory, getAllCategory, getBycategory, updateCategory, deleteCategory };
