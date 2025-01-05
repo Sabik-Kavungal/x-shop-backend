@@ -29,4 +29,33 @@ const getAllCategory = async (req, res) => {
 
 }
 
-module.exports = { addCategory, getAllCategory };
+const getBycategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { rows } = await pool.query("SELECT * FROM category WHERE id = $1", [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+        res.status(200).json({ data: rows[0] });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+}
+
+const updateCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, image } = req.body;
+
+        const { rows } = await pool.query(`UPDATE category SET name = $1, description = $2, image = $3 WHERE id = $4 RETURNING *`,[name, description, image, id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+
+        res.status(200).json({ message: "Category updated successfully", data: rows[0] });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+}
+
+module.exports = { addCategory, getAllCategory, getBycategory, updateCategory };
