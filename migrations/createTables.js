@@ -56,9 +56,22 @@ const createTables = async () => {
         );
     `);
 
+        // create carts table
+        await pool.query(`
+        CREATE TABLE IF NOT EXISTS carts (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        item_id INTEGER NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+        quantity INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        `);
+
+
 
 
         console.log('Tables created successfully.');
+        
         process.exit(0);
     } catch (err) {
         console.error('Error creating tables:', err.message);

@@ -6,21 +6,31 @@ const pool = require('./config/db');
 const authRouter = require('./routes/authRoutes');
 const categoryRoute = require('./routes/categoryRoute');
 const itemsRoute = require('./routes/itemsRoutes');
+const cartsRoute = require('./routes/cartsRoutes');
 
 
 const app = express();
 
 app.use(cors());
 
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // Parses JSON payload
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({ error: 'Invalid JSON payload' });
+    }
+    next();
+});
+
 
 
 
 app.use('/user', authRouter);
 app.use('/category', categoryRoute);
 app.use('/items', itemsRoute);
+app.use('/carts',cartsRoute);
 
 
 pool.connect();

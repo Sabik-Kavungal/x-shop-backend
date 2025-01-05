@@ -6,10 +6,10 @@ const auth = async (req, res, next) => {
         const token = req.header('auth');
         if (!token) return res.status(401).json({ msg: 'No auth Token, access desied' });
 
-        const verified = jwt.verify('sabik', token);
+        const verified = jwt.verify(token, "sabik");
         if (!verified) return res.status(401).json({ msg: ' Token verification faild  ' });
 
-        const { row: users } = await pool.query(`SELECT * FROM users WHERE id = $1`, [verified.id]);
+        const { rows: users } = await pool.query(`SELECT * FROM users WHERE id = $1`, [verified.id]);
 
 
         if (users.length === 0) {
@@ -21,6 +21,8 @@ const auth = async (req, res, next) => {
 
         next();
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' })
+        res.status(500).json({ error:  error.message  })
     }
 }
+
+module.exports = auth;
