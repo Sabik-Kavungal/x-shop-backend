@@ -35,7 +35,9 @@ const createTables = async () => {
         await pool.query(`
     CREATE TABLE IF NOT EXISTS category (
         id SERIAL PRIMARY KEY,
-        name VARCHAR(100) UNIQUE NOT NULL
+        name VARCHAR(100) UNIQUE NOT NULL,
+        description TEXT NOT NULL,
+        image TEXT NOT NULL
     );
 `);
 

@@ -4,6 +4,7 @@ const cors = require('cors');
 // Importing the pool instance from `pool.js`
 const pool = require('./config/db');
 const authRouter = require('./routes/authRoutes');
+const categoryRoute = require('./routes/categoryRoute');
 
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 app.use('/user', authRouter);
+app.use('/category', categoryRoute);
 
 
 pool.connect();
