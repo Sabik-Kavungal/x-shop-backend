@@ -17,18 +17,18 @@ const createTables = async () => {
         );
       `);
 
-    //     // Add the category_id column to sabik table
-    //     await pool.query(`
-    //     ALTER TABLE sabik
-    //     ADD COLUMN IF NOT EXISTS category_id INTEGER;
-    // `);
+        //     // Add the category_id column to sabik table
+        //     await pool.query(`
+        //     ALTER TABLE sabik
+        //     ADD COLUMN IF NOT EXISTS category_id INTEGER;
+        // `);
 
 
-    //     await pool.query(`
-    //     ALTER TABLE sabik
-    //     ADD CONSTRAINT category_fk FOREIGN KEY (category_id)
-    //     REFERENCES category(id) ON DELETE SET NULL;
-    // `);
+        //     await pool.query(`
+        //     ALTER TABLE sabik
+        //     ADD CONSTRAINT category_fk FOREIGN KEY (category_id)
+        //     REFERENCES category(id) ON DELETE SET NULL;
+        // `);
 
 
         // Create categories table
@@ -40,6 +40,21 @@ const createTables = async () => {
         image TEXT NOT NULL
     );
 `);
+
+        // Create categories table
+        await pool.query(`
+        CREATE TABLE IF NOT EXISTS items (
+           
+        id SERIAL PRIMARY KEY,
+           name VARCHAR(100) UNIQUE NOT NULL,
+           price DECIMAL(10,2) NOT NULL,
+           description TEXT NOT NULL,
+           image TEXT NOT NULL,
+           category_id INTEGER NOT NULL REFERENCES category(id) ON DELETE CASCADE,
+           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+        );
+    `);
 
 
 
