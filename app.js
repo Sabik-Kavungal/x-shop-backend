@@ -7,6 +7,7 @@ const authRouter = require('./routes/authRoutes');
 const categoryRoute = require('./routes/categoryRoute');
 const itemsRoute = require('./routes/itemsRoutes');
 const cartsRoute = require('./routes/cartsRoutes');
+const ordersRoute = require('./routes/ordersRoutes');
 
 
 const app = express();
@@ -31,6 +32,7 @@ app.use('/user', authRouter);
 app.use('/category', categoryRoute);
 app.use('/items', itemsRoute);
 app.use('/carts',cartsRoute);
+app.use('/orders', ordersRoute);
 
 
 pool.connect();

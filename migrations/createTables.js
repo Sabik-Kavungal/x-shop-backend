@@ -68,10 +68,39 @@ const createTables = async () => {
         `);
 
 
+        await pool.query(
+
+            `
+            CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    address TEXT NOT NULL,
+    status VARCHAR(50) DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+            `
+        )
+
+        await pool.query(
+            `
+            
+            CREATE TABLE IF NOT EXISTS order_items (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    item_id INTEGER NOT NULL REFERENCES items(id),
+    quantity INTEGER NOT NULL,
+    price DECIMAL(10, 2) NOT NULL
+);
+`
+        )
+
+
 
 
         console.log('Tables created successfully.');
-        
+
         process.exit(0);
     } catch (err) {
         console.error('Error creating tables:', err.message);

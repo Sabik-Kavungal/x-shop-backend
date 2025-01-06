@@ -54,4 +54,4 @@ const incrementQty = async (req, res) => {
     }
 }
 
-module.exports = { addToCart, getAllcarts,incrementQty }
+module.exports = { addToCart, getAllcarts, incrementQty }
