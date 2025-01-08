@@ -29,4 +29,35 @@ const getAllItems = async (req, res) => {
     }
 }
 
-module.exports = { addItems, getAllItems };
+// Get Item by gebi_id
+const   getItemById = async (req, res) => {
+    try {
+        const { id } = req.params; // Get the gebi_id from the URL params
+
+        // Query to fetch item by gebi_id
+        const { rows } = await pool.query(`
+            SELECT 
+                items.id, 
+                items.name, 
+                items.price, 
+                items.description, 
+                items.image, 
+                items.category_id, 
+                category.name AS category_name, 
+                items.id
+            FROM items
+            LEFT JOIN category ON items.category_id = category.id
+            WHERE items.id = $1
+        `, [id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: `Item with gebi_id ${gebi_id} not found` });
+        }
+
+        res.status(200).json({ data: rows[0] });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+}
+
+module.exports = { addItems, getAllItems,getItemById };
