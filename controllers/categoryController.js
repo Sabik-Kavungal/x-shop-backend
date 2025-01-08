@@ -67,4 +67,30 @@ const deleteCategory = async (req, res) => {
         res.status(500).json({ error: e.message });
     }
 }
-module.exports = { addCategory, getAllCategory, getBycategory, updateCategory, deleteCategory };
+
+// Fetch all items by category
+const getItemsByCategory = async (req, res) => {
+    try {
+        const { categoryId } = req.params; // Get category ID from request parameters
+
+        // Query database for items in the given category
+        const { rows } = await pool.query(
+            `SELECT items.id, items.name, items.price, items.description, items.image, items.category_id, category.name AS category_name 
+             FROM items 
+             LEFT JOIN category ON items.category_id = category.id 
+             WHERE items.category_id = $1`, [categoryId]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "No items found for this category" });
+        }
+
+        res.status(200).json({ data: rows });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};
+
+
+
+module.exports = { addCategory, getAllCategory, getBycategory, updateCategory, deleteCategory,getItemsByCategory };
