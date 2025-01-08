@@ -56,4 +56,82 @@ const placeOrder = async (req, res) => {
     }
 };
 
-module.exports = { placeOrder }
+const getAllOrders = async (req, res) => {
+    try {
+        // Get user ID from the request object
+        const user_id = req.user.id;
+
+        // Fetch all orders for the specific user
+        const ordersResult = await pool.query(`
+            SELECT 
+                o.id AS order_id, 
+                o.user_id, 
+                o.total_amount, 
+                o.address, 
+                o.status, 
+                o.created_at,
+                u.name AS user_name,
+                u.email AS user_email
+            FROM orders o
+            JOIN users u ON o.user_id = u.id
+            WHERE o.user_id = $1
+            ORDER BY o.created_at DESC
+        `, [user_id]);
+
+        const orders = ordersResult.rows;
+
+        if (orders.length === 0) {
+            return res.status(200).json({
+                msg: 'No orders found for this user',
+                orders: [],
+            });
+        }
+
+        // Fetch items for the orders
+        const orderIds = orders.map(order => order.order_id);
+
+        const itemsResult = await pool.query(`
+            SELECT 
+                oi.order_id, 
+                oi.item_id, 
+                oi.quantity, 
+                oi.price,
+                i.name AS item_name
+            FROM order_items oi
+            JOIN items i ON oi.item_id = i.id
+            WHERE oi.order_id = ANY($1::int[])
+        `, [orderIds]);
+
+        const items = itemsResult.rows;
+
+        // Combine orders with their items
+        const ordersWithItems = orders.map(order => ({
+            id: order.order_id,
+            user: {
+                id: order.user_id,
+                name: order.user_name,
+                email: order.user_email,
+            },
+            total_amount: order.total_amount,
+            address: order.address,
+            status: order.status,
+            created_at: order.created_at,
+            items: items.filter(item => item.order_id === order.order_id).map(item => ({
+                id: item.item_id,
+                name: item.item_name,
+                quantity: item.quantity,
+                price: item.price,
+            })),
+        }));
+
+        res.status(200).json({
+            msg: 'Orders retrieved successfully',
+            orders: ordersWithItems,
+        });
+    } catch (err) {
+        console.error('Error fetching orders:', err.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+module.exports = { placeOrder,getAllOrders }
