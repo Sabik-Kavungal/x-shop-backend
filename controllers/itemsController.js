@@ -19,7 +19,7 @@ const addItems = async (req, res) => {
 
 const getAllItems = async (req, res) => {
     try {
-        const { rows } = await pool.query(`SELECT items.id , items.name , items.price , items.description , items.image items.category_id , category.name AS category_name FROM items LEFT JOIN category ON items.category_id = category.id`);
+        const { rows } = await pool.query(`SELECT items.id , items.name , items.price , items.description , items.image ,items.category_id , category.name AS category_name FROM items LEFT JOIN category ON items.category_id = category.id`);
         if (rows.length === 0) {
             return res.status(404).json({ message: "No items found" });
         }
