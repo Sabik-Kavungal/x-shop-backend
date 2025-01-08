@@ -67,29 +67,36 @@ const deleteCategory = async (req, res) => {
         res.status(500).json({ error: e.message });
     }
 }
-
-// Fetch all items by category
+// Get items by category ID
 const getItemsByCategory = async (req, res) => {
     try {
-        const { categoryId } = req.params; // Get category ID from request parameters
+        const { id } = req.params; // Category ID from request parameters
 
-        // Query database for items in the given category
         const { rows } = await pool.query(
-            `SELECT items.id, items.name, items.price, items.description, items.image, items.category_id, category.name AS category_name 
-             FROM items 
-             LEFT JOIN category ON items.category_id = category.id 
-             WHERE items.category_id = $1`, [categoryId]
+            `SELECT items.id, items.name, items.price, items.description, items.image, items.category_id, category.name AS category_name
+             FROM items
+             LEFT JOIN category ON items.category_id = category.id
+             WHERE items.category_id = $1`,
+            [id]
         );
 
         if (rows.length === 0) {
             return res.status(404).json({ message: "No items found for this category" });
         }
 
-        res.status(200).json({ data: rows });
+        // Get the category name from the query result
+        const categoryName = rows.length > 0 ? rows[0].category_name : 'Unknown';
+
+        // Return the items along with the category name in the response
+        res.status(200).json({
+            category_name: categoryName,
+            items: rows
+        });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
 };
+
 
 
 
