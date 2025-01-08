@@ -51,7 +51,7 @@ const   getItemById = async (req, res) => {
         `, [id]);
 
         if (rows.length === 0) {
-            return res.status(404).json({ message: `Item with gebi_id ${gebi_id} not found` });
+            return res.status(404).json({ message: `Item with gebi_id ${id} not found` });
         }
 
         res.status(200).json({ data: rows[0] });
