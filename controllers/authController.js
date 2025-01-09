@@ -43,29 +43,38 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        // Debugging: Log incoming email
+        console.log("Login attempt with email:", email);
+
         const { rows: users } = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
-        if (users.length === 0) {
+
+        // Debugging: Log database response
+        console.log("Database response:", users);
+
+        if (!users || users.length === 0) {
             return res.status(400).json({ message: 'Email not found' });
         }
 
         const user = users[0];
 
+        // Verify password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid password' });
         }
 
+        // Generate token
         const token = jwt.sign({ id: user.id }, "sabik", {
-            expiresIn: '1h'
+            expiresIn: '1h',
         });
 
         res.json({ token, user });
-
     } catch (e) {
-
+        console.error("Login error:", e.message);
         res.status(500).json({ e: e.message });
     }
-}
+};
 
 // Get Profile API
 const getProfile = async (req, res) => {
