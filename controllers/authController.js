@@ -31,13 +31,25 @@ const register = async (req, res) => {
             [name, email, hashedPassword, address, phone, image.filename]
         );
 
-        return res.status(201).json({ message: rows[0] });
+        // Construct the full URL for the image
+        const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${image.filename}`;
+
+        return res.status(201).json({
+            message: 'User registered successfully',
+            user: {
+                id: rows[0].id,
+                name: rows[0].name,
+                email: rows[0].email,
+                address: rows[0].address,
+                phone: rows[0].phone,
+                image: imageUrl, // Include the full image URL
+            }
+        });
     } catch (e) {
         console.error(e); // Log error for debugging
         return res.status(500).json({ error: e.message || 'Internal Server Error' });
     }
 };
-
 
 
 const login = async (req, res) => {
