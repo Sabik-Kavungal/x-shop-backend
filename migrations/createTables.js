@@ -94,7 +94,21 @@ const createTables = async () => {
     price DECIMAL(10, 2) NOT NULL
 );
 `
-        )
+        );
+
+
+        await pool.query(`
+             CREATE TABLE IF NOT EXISTS promotion_banners  (
+              id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    image_url TEXT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+
+        ) `);
 
 
 

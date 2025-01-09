@@ -9,6 +9,7 @@ const categoryRoute = require('./routes/categoryRoute');
 const itemsRoute = require('./routes/itemsRoutes');
 const cartsRoute = require('./routes/cartsRoutes');
 const ordersRoute = require('./routes/ordersRoutes');
+const promoBrRoute = require('./routes/promotionBrRoutes');
 
 
 const app = express();
@@ -32,8 +33,9 @@ app.use((err, req, res, next) => {
 app.use('/user', authRouter);
 app.use('/category', categoryRoute);
 app.use('/items', itemsRoute);
-app.use('/carts',cartsRoute);
+app.use('/carts', cartsRoute);
 app.use('/orders', ordersRoute);
+app.use('/promotion/banner', promoBrRoute);
 
 
 pool.connect();

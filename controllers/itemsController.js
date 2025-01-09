@@ -30,7 +30,7 @@ const getAllItems = async (req, res) => {
 }
 
 // Get Item by gebi_id
-const   getItemById = async (req, res) => {
+const getItemById = async (req, res) => {
     try {
         const { id } = req.params; // Get the gebi_id from the URL params
 
@@ -60,4 +60,4 @@ const   getItemById = async (req, res) => {
     }
 }
 
-module.exports = { addItems, getAllItems,getItemById };
+module.exports = { addItems, getAllItems, getItemById };
