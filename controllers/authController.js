@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const register = async (req, res) => {
     try {
@@ -58,4 +59,48 @@ const login = async (req, res) => {
     }
 }
 
-module.exports = { register, login };
+// Get Profile API
+const getProfile = async (req, res) => {
+    try {
+        const userId = req.user.id; // Assuming middleware sets req.user
+        const { rows: user } = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+
+        if (user.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ user: user[0] });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};
+
+// Update Profile API
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id; // Assuming middleware sets req.user
+        const { name, address, phone } = req.body;
+        const image = req.file;
+
+        let updateQuery = 'UPDATE users SET name = $1, address = $2, phone = $3';
+        const values = [name, address, phone];
+        if (image) {
+            updateQuery += ', image = $4';
+            values.push(image.filename);
+        }
+        updateQuery += ' WHERE id = $5 RETURNING *';
+        values.push(userId);
+
+        const { rows } = await pool.query(updateQuery, values);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ message: 'Profile updated successfully', user: rows[0] });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};
+
+module.exports = { register, login, getProfile, updateProfile };
