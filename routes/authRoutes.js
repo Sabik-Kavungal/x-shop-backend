@@ -3,8 +3,10 @@ const { register, login, getProfile, updateProfile } = require('../controllers/a
 const auth = require('../middleware/user'); // Assuming this middleware exists
 const router = express.Router();
 
+const upload = require('../middleware/image/image');
+
 // Public routes
-router.post('/register', register);
+router.post('/register', upload.single('image'), register);
 router.post('/login', login);
 
 // Protected routes
