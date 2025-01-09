@@ -1,8 +1,7 @@
 const express = require('express');
-const { register, login, getProfile, updateProfile } = require('../controllers/authController');
-const auth = require('../middleware/user'); // Assuming this middleware exists
 const router = express.Router();
-
+const { register, login, getProfile, updateProfile } = require('../controllers/authController');
+const auth = require('../middleware/user');
 const upload = require('../middleware/image/image');
 
 // Public routes
