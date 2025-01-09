@@ -10,6 +10,7 @@ const itemsRoute = require('./routes/itemsRoutes');
 const cartsRoute = require('./routes/cartsRoutes');
 const ordersRoute = require('./routes/ordersRoutes');
 const promoBrRoute = require('./routes/promotionBrRoutes');
+const delOfdayRoute = require('./routes/dealOfdayRoutes');
 
 
 const app = express();
@@ -36,6 +37,7 @@ app.use('/items', itemsRoute);
 app.use('/carts', cartsRoute);
 app.use('/orders', ordersRoute);
 app.use('/promotion/banner', promoBrRoute);
+app.use('/deal', delOfdayRoute);
 
 
 pool.connect();

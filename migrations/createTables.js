@@ -110,6 +110,18 @@ const createTables = async () => {
 
         ) `);
 
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS deals_of_the_day  (
+                id SERIAL PRIMARY KEY,
+    item_id INTEGER NOT NULL REFERENCES items(id),
+    discount_percentage NUMERIC(5, 2) NOT NULL, -- Discount for the deal
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+
+       ) `);
+
 
 
 
