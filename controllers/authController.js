@@ -105,31 +105,88 @@ const getProfile = async (req, res) => {
 };
 
 // Update Profile API
+// Update Profile API
 const updateProfile = async (req, res) => {
     try {
         const userId = req.user.id; // Assuming middleware sets req.user
         const { name, address, phone } = req.body;
         const image = req.file;
 
-        let updateQuery = 'UPDATE users SET name = $1, address = $2, phone = $3';
-        const values = [name, address, phone];
+        // Validate inputs
+        if (!name && !address && !phone && !image) {
+            return res.status(400).json({ message: 'Nothing to update' });
+        }
+
+        // If an image is provided, validate its type
+        let imageUrl = null;
         if (image) {
-            updateQuery += ', image = $4';
+            const allowedExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
+            const fileExtension = path.extname(image.originalname).toLowerCase();
+            if (!allowedExtensions.includes(fileExtension)) {
+                return res.status(400).json({ error: "Invalid image file type. Allowed: png, jpg, jpeg, webp" });
+            }
+
+            imageUrl = `${req.protocol}://${req.get('host')}/uploads/${image.filename}`;
+        }
+
+        // Build the update query dynamically
+        const updates = [];
+        const values = [];
+        let index = 1;
+
+        if (name !== undefined) {
+            updates.push(`name = $${index++}`);
+            values.push(name);
+        }
+
+        if (address !== undefined) {
+            updates.push(`address = $${index++}`);
+            values.push(address);
+        }
+
+        if (phone !== undefined) {
+            updates.push(`phone = $${index++}`);
+            values.push(phone);
+        }
+
+        if (imageUrl !== null) {
+            updates.push(`image = $${index++}`);
             values.push(image.filename);
         }
-        updateQuery += ' WHERE id = $5 RETURNING *';
+
+        if (updates.length === 0) {
+            return res.status(400).json({ message: 'Nothing to update' });
+        }
+
         values.push(userId);
 
-        const { rows } = await pool.query(updateQuery, values);
+        // Execute the update query
+        const { rowCount } = await pool.query(
+            `UPDATE users SET ${updates.join(", ")} WHERE id = $${index} RETURNING *`,
+            values
+        );
 
-        if (rows.length === 0) {
+        if (rowCount === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.json({ message: 'Profile updated successfully', user: rows[0] });
+        // Fetch the updated user data
+        const { rows: updatedUser } = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+
+        res.json({
+            message: 'Profile updated successfully',
+            user: {
+                id: updatedUser[0].id,
+                name: updatedUser[0].name,
+                email: updatedUser[0].email,
+                address: updatedUser[0].address,
+                phone: updatedUser[0].phone,
+                image: imageUrl || (updatedUser[0].image ? `${req.protocol}://${req.get('host')}/uploads/${updatedUser[0].image}` : null),
+            },
+        });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        console.error(e);
+        res.status(500).json({ error: e.message || 'Internal Server Error' });
     }
 };
-
 module.exports = { register, login, getProfile, updateProfile };
